@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+OUT_FLAG=/tmp/beep.out
+PIN=3
+DELAY=${1:-0}
+[[ "$DELAY" =~ ^[0-9]+\.?[0-9]*$ ]] || DELAY=0
+
+shortest_beep() {
+	gpio write $PIN 1
+	gpio write $PIN 0
+}
+
+delayed_beep() {
+	gpio write $PIN 1
+	sleep $DELAY 2>&-
+	gpio write $PIN 0
+}
+
+[ ! -f "$OUT_FLAG" ] && gpio mode $PIN out && touch "$OUT_FLAG"
+[ "$DELAY" != 0 ] && delayed_beep || shortest_beep

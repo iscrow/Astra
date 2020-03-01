@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+readonly serial=/dev/ttyS0
+timeout=5
+
+function sendTime() {
+	# set the serial port speed
+	stty -F ${serial} 9600
+
+	# get the date in the order the protocol calls for
+	dtm="$(date -u '+%_H %_M %_S %_m %_d %_y 0 0')"
+
+	# H is the command char; the following 8 bytes are the date/time
+	HEX="\\\\x%02X"
+	unset FORMAT
+	for i in {1..8}; do FORMAT="${FORMAT}${HEX}"; done
+	hex_text="$(printf "H${FORMAT}" ${dtm})"
+
+	echo "Writing time to HC: '${hex_text}' -> '${serial}'"
+	timeout $timeout echo -ne "${hex_text}" > ${serial}
+}
+
+sendTime

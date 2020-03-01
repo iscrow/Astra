@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -e
+
+GPSTIME=$(gpspipe -r | grep -m1 GPZDA | perl -pe 's/^\$GPZDA,(\d\d)(\d\d)(\d\d)\.\d\d\d,(\d\d),(\d\d),(\d\d\d\d),.*/\6-\5-\4 \1:\2:\3 UTC/g')
+date -s "$GPSTIME"
