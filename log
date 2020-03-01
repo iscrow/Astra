@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#Feb 29 20:52:27 astra user.alert  pi: logger -p1
+#Feb 29 20:52:27 astra user.crit   pi: logger -p2
+#Feb 29 20:52:27 astra user.err    pi: logger -p3
+#Feb 29 20:52:27 astra user.warn   pi: logger -p4
+#Feb 29 20:52:27 astra user.notice pi: logger -p5
+#Feb 29 20:52:28 astra user.info   pi: logger -p6
+#Feb 29 20:52:28 astra user.debug  pi: logger -p7
+
+SCRIPT=$(basename $0)
+
+PRIORITY=6
+LEVEL="INFO"
+
+[ "$SCRIPT" == "log_info" ] && PRIORITY=6 && LEVEL="INFO"
+[ "$SCRIPT" == "log_warn" ] && PRIORITY=4 && LEVEL="WARN"
+
+MSG="***ASTRA $LEVEL: $*"
+logger -p $PRIORITY "$MSG"
+echo "$(date): $MSG" >> /tmp/Astra.log

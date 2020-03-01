@@ -23,3 +23,4 @@ function sendTime() {
 }
 
 sendTime
+log_info "Time $(date) sent to telescope"
