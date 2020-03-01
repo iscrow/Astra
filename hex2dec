@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+while read -r A B < <(cat); do
+	echo "ibase=16;obase=A;$A;$B" | bc | tr '\n' ' '
+	echo
+done
