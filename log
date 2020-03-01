@@ -7,6 +7,8 @@
 #Feb 29 20:52:28 astra user.info   pi: logger -p6
 #Feb 29 20:52:28 astra user.debug  pi: logger -p7
 
+LOGFILE=/tmp/astra.log
+
 SCRIPT=$(basename $0)
 
 PRIORITY=6
@@ -17,4 +19,4 @@ LEVEL="INFO"
 
 MSG="***ASTRA $LEVEL: $*"
 logger -p $PRIORITY "$MSG"
-echo "$(date): $MSG" >> /tmp/Astra.log
+echo "$(date): $MSG" >> "$LOGFILE"
