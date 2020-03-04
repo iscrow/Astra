@@ -4,7 +4,7 @@ enable_pat_routing
 set_time_from_gps && beep 1 100 100 || beep 1 1000 100
 sleep 0.5
 send_time_to_synscan && beep 2 100 100 || beep 2 1000 100
-send_location_to_synscan && beep 3 100 100 || beep 3 1000 100
-systemctl start ser2net && ( beep 4 100 100; log_info "Serial proxy ser2net started" ) || beep 4 1000 100
-sleep 0.5
-internet_check && beep 5 100 100 || beep 5 1000 100
+#send_location_to_synscan && beep 3 100 100 || beep 3 1000 100
+#systemctl start ser2net && ( beep 4 100 100; log_info "Serial proxy ser2net started" ) || beep 4 1000 100
+#sleep 0.5
+#internet_check && beep 5 100 100 || beep 5 1000 100

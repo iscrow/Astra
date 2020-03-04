@@ -2,13 +2,14 @@
 
 set -e
 
-readonly serial=/dev/ttyS0
+#readonly serial=/dev/ttyS0
+timeout=5
 
 location=$(get_gps.py)
 
 if [ ${?} != 0 ]; then exit; fi
 
-stty -F ${serial} 9600
+#stty -F ${serial} 9600
 
 HEX="\\\\x%02X"
 unset FORMAT
@@ -19,6 +20,13 @@ done
 echo "Location: '${location}'"
 hex_text="$(printf "W${FORMAT}" ${location})"
 
-echo "Writing location to HC: '${hex_text}'"
-echo -ne "${hex_text}" > ${serial}
-log_info "Location $location sent to telescope"
+#echo "Writing location to HC: '${hex_text}'"
+#echo -ne "${hex_text}" > ${serial}
+RESPONSE=$(echo -ne "${hex_text}" | netcat -w $timeout -W 1 127.0.0.1 4030)
+if [ "$RESPONSE" == "#" ]; then
+	log_info "Location ${location} sent to telescope"
+	exit 0
+else
+	log_warn "Location ${location} send to delescope FAILED"
+	exit 1
+fi

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+shopt -s nocasematch
+
+QUERY="Z"
+ACCURACY="4"
+PARAM="$1"
+
+usage() {
+	cat <<-EOF
+		get_alt_az_low_accuracy retrieves altitude/azimuth coordinates from the telescope mount. specify "high" for high resolution output
+
+		Usage: get_alt_az_low_accuracy [high]
+
+		Examples:
+		    get_alt_az_low_accuracy
+		    get_alt_az_low_accuracy high
+		EOF
+		exit 1
+}
+
+[[ "$PARAM" =~ -h|--help ]] && usage 
+
+if [[ "$PARAM" =~ high ]]; then
+	QUERY="z"
+	ACCURACY="8"
+fi
+
+PATTERN="([0-9A-F]{$ACCURACY}),([0-9A-F]{$ACCURACY})#"
+echo $QUERY | netcat -W 1 127.0.0.1 4030 | sed -E "s/$PATTERN/\1 \2\n/g" | hex2dec
