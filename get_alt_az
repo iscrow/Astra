@@ -27,4 +27,4 @@ if [[ "$PARAM" =~ high ]]; then
 fi
 
 PATTERN="([0-9A-F]{$ACCURACY}),([0-9A-F]{$ACCURACY})#"
-echo $QUERY | netcat -W 1 127.0.0.1 4030 | sed -E "s/$PATTERN/\1 \2\n/g" | hex2dec
+echo $QUERY | netcat -W 1 127.0.0.1 4030 | sed -E "s/$PATTERN/\2 \1\n/g" | hex2dec

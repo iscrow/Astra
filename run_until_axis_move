@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+MOVE_THRESHOLD=1000
+
+finish() {
+	echo
+}
+trap finish EXIT
+
+degrees() {
+	RAW=$1
+	perl -le "printf('%.2f', 360*$RAW/65536)"
+}
+
+DEGREES=$(degrees $MOVE_THRESHOLD)
+
+usage() {
+	cat <<- EOF
+		run_until_axis_move executes a specified command in the background and interrupts it if the azimut axis is moved over $DEGREES degrees per second.
+
+		Usage:
+		    run_until_axis_move COMMAND
+
+		Example:
+		    run_until_axis_move send_location_to_synscan
+	EOF
+	exit 1
+}
+
+get_az() {
+	local AZ=$(get_alt_az | awk '{print $2}')
+	AZ=${AZ:-0}
+	echo $AZ
+}
+
+check_background() {
+	jobs %% &>/dev/null || exit 0
+}
+
+
+CMD=$*
+
+[ -z "$CMD" ] && usage
+
+$CMD &
+
+AZ1=$(get_az)
+while :; do
+	check_background
+	sleep 1
+	check_background
+	echo -n '.'
+	AZ2=$(get_az)
+	#echo "abs($AZ1-$AZ2)"
+	DIFF=$(perl -le "print abs($AZ1-$AZ2)")
+	[[ $DIFF -gt 40000 ]] && DIFF=$(perl -le "print abs($DIFF-65536)")
+	AZ1=$AZ2
+	if [[ "$DIFF" -gt $MOVE_THRESHOLD ]]; then
+		DEGREES=$(degrees $DIFF)
+		MSG="Detected an azimuth move of $DEGREES degrees. Aborting '$CMD' command"
+		echo "$MSG"
+		log_warn "$MSG"
+		kill %1 || kill -9 %1
+		exit 1
+	fi
+done
