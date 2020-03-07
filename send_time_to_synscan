@@ -4,6 +4,7 @@ set -e
 
 #readonly serial=/dev/ttyS0
 timeout=5
+MAX_RETRIES=5
 
 # set the serial port speed
 #stty -F ${serial} 9600
@@ -19,12 +20,21 @@ hex_text="$(printf "H${FORMAT}" ${dtm})"
 
 #echo "Writing time to HC: '${hex_text}'
 #timeout $timeout echo -ne "${hex_text}" > ${serial}
-RESPONSE=$(echo -ne "${hex_text}" | netcat -w $timeout -W 1 127.0.0.1 4030)
+RETRIES=0
+RESPONSE=""
+
+while [ "$RESPONSE" != "#" ] && [ "$RETRIES" -le "$MAX_RETRIES" ] ; do
+	((RETRIES=$RETRIES+1))
+	RESPONSE=$(echo -ne "${hex_text}" | netcat -w $timeout -W 1 127.0.0.1 4030)
+done
+
+RET_MSG=""
+[ "$RETRIES" -gt 1 ] && RET_MSG="after $RETRIES retries."
 
 if [ "$RESPONSE" == "#" ]; then
-	log_info "Time ${dtm} sent to telescope"
+	log_info "Time ${dtm} sent to telescope $RET_MSG"
 	exit 0
 else
-	log_warn "Time ${dtm} send to delescope FAILED"
+	log_warn "Time ${dtm} send to delescope FAILED $RET_MSG"
 	exit 1
 fi

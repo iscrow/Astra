@@ -4,6 +4,7 @@ set -e
 
 #readonly serial=/dev/ttyS0
 timeout=5
+MAX_RETRIES=5
 
 location=$(get_gps.py)
 
@@ -22,11 +23,21 @@ hex_text="$(printf "W${FORMAT}" ${location})"
 
 #echo "Writing location to HC: '${hex_text}'"
 #echo -ne "${hex_text}" > ${serial}
-RESPONSE=$(echo -ne "${hex_text}" | netcat -w $timeout -W 1 127.0.0.1 4030)
+RETRIES=0
+RESPONSE=""
+
+while [ "$RESPONSE" != "#" ] && [ "$RETRIES" -le "$MAX_RETRIES" ] ; do
+	((RETRIES=$RETRIES+1))
+	RESPONSE=$(echo -ne "${hex_text}" | netcat -w $timeout -W 1 127.0.0.1 4030)
+done
+
+RET_MSG=""
+[ "$RETRIES" -gt 1 ] && RET_MSG="after $RETRIES retries."
+
 if [ "$RESPONSE" == "#" ]; then
-	log_info "Location ${location} sent to telescope"
+	log_info "Location ${location} sent to telescope $RET_MSG"
 	exit 0
 else
-	log_warn "Location ${location} send to delescope FAILED"
+	log_warn "Location ${location} send to delescope FAILED $RET_MSG"
 	exit 1
 fi

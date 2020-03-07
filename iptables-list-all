@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+TABLES="filter nat mangle raw security"
+
+for TABLE in $TABLES; do
+	LIST=$(iptables -nvL -t $TABLE)
+	if grep -P "^\s+\d" <<< $LIST &>/dev/null; then
+		echo "Table: $TABLE"
+		echo '------------------'
+		echo "$LIST"
+		echo
+		echo
+	fi
+done
