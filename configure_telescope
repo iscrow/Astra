@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+
+pause() {
+	# Time set happens quick so pause briefly so the beeps don't blend in (Artificial delays... eww. Should come up with an alternative.... TODO)
+	sleep 0.5
+}
+
 # Signal that initialization is starting
 beeptrain $(seq 40)
 
@@ -15,10 +21,10 @@ setserial /dev/ttyUSB0 low_latency
 #enable_pat_routing
 
 # Set system time from GPS (my gps has a battery backed RTC - Adafruit Ultimate GPS Breakout - 66 channel w/10 Hz updates (Version 3)
-set_time_from_gps && beep 1 100 100 || beep 1 1000 100
+# set_time_from_gps && beep 1 100 100 || beep 1 1000 100
+check_time_sync && beep 1 100 100 || beep 1 1000 100
 
-# Time set happens quick so pause briefly so the beeps don't blend in (Artificial delays... eww. Should come up with an alternative.... TODO)
-sleep 0.5
+pause
 
 # Set the SynScan time. Using UTC. Maybe I should do local? Thinking about it.
 send_time_to_synscan && beep 2 100 100 || beep 2 1000 100
@@ -29,8 +35,12 @@ run_until_axis_move send_location_to_synscan && beep 3 100 100 || beep 3 1000 10
 # Now that we're done talking to the mount allow external traffic in to control the telescope (SkySafari, Stellarium, etc.)
 allow_ser2net_port
 
-# Time set happens quick so pause briefly so the beeps don't blend in (Artificial delays... eww. Should come up with an alternative.... TODO)
-sleep 0.5
+pause
 
 # Check and signal internet connectivity
 internet_check && beep 4 100 100 || beep 4 1000 100
+
+pause
+
+# Signal end of initialization
+beep 50 10 10

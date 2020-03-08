@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 MOVE_THRESHOLD=1000
+BEEP_EVERY=10
+PATTERN="1 60 1 60 1"
 
 finish() {
 	echo
@@ -45,8 +47,12 @@ CMD=$*
 $CMD &
 
 AZ1=$(get_az)
+BEEPCOUNTER=0
 while :; do
 	check_background
+	[ "$BEEPCOUNTER" -ge "$BEEP_EVERY" ] && BEEPCOUNTER=0
+	[ "$BEEPCOUNTER" -eq 0 ] && beeptrain $PATTERN
+    ((BEEPCOUNTER++))
 	sleep 1
 	check_background
 	echo -n '.'
