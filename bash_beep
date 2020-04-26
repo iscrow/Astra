@@ -12,7 +12,7 @@ shortest_beep() {
 
 delayed_beep() {
 	gpio write $PIN 1
-	sleep $DELAY 2>&-
+	sleep $DELAY 2>/dev/null
 	gpio write $PIN 0
 }
 

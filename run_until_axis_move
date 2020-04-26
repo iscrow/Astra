@@ -59,14 +59,17 @@ while :; do
 	AZ2=$(get_az)
 	#echo "abs($AZ1-$AZ2)"
 	DIFF=$(perl -le "print abs($AZ1-$AZ2)")
+	DIFF1=$DIFF
 	[[ $DIFF -gt 40000 ]] && DIFF=$(perl -le "print abs($DIFF-65536)")
+	DIFF2=$DIFF
+	log_info "AZ1: $AZ1, AZ2: $AZ2, DIFF1: $DIFF1, DIFF2: $DIFF2, THRESHOLD: $MOVE_THRESHOLD."
 	AZ1=$AZ2
 	if [[ "$DIFF" -gt $MOVE_THRESHOLD ]]; then
 		DEGREES=$(degrees $DIFF)
-		MSG="Detected an azimuth move of $DEGREES degrees. Aborting '$CMD' command"
+		MSG="Detected an azimuth move of $DEGREES degrees. Raw difference: $DIFF1, 360deg flip compensated difference: $DIFF2, threshold: $MOVE_THRESHOLD. Aborting '$CMD' command."
 		echo "$MSG"
 		log_warn "$MSG"
 		kill %1 || kill -9 %1
-		exit 1
+		exit 127
 	fi
 done

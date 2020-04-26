@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+while :; do
+	chronyc tracking | grep 'Last offset' | grep -Pv '[^0-9]0+\.0+ ' &>/dev/null && exit 0
+	sleep 1
+done

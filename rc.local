@@ -11,7 +11,7 @@
 #
 # By default this script does nothing.
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/Astra
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin/Astra
 
 # Print the IP address
 _IP=$(hostname -I) || true
@@ -19,5 +19,14 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-configure_telescope &
+(
+LOG=/tmp/online.log
+while :; do
+	ping 1.1.1.1 -w 1 -W 1 -c 1 &>/dev/null && STATE="UP" || STATE="DOWN"
+	echo "$(date) :: $STATE" >> $LOG
+	sleep 1 
+done
+) &
+
+configure_telescope > /tmp/configure_telescope.log 2>&1 &
 exit 0
