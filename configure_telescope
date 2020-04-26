@@ -3,6 +3,7 @@
 
 SOUND_OK="-s gamelan"
 SOUND_FAIL="-s siren"
+SOUND_FINAL="-s echo"
 
 function pause {
 	# Time set happens quick so pause briefly so the beeps don't blend in (Artificial delays... eww. Should come up with an alternative.... TODO)
@@ -48,7 +49,8 @@ setserial /dev/ttyUSB0 low_latency
 #enable_pat_routing
 
 
-message $SOUND_OK -t "Astra Initializing..." "Starting telescope configuration. Standby..."
+CURRENT_IPS=$(get_ips)
+message $SOUND_OK -t "Astra Initializing..." $'Starting telescope configuration.\n\n'"${CURRENT_IPS}"$'\n\n Standby...'
 
 # Set system time from the GPS (my gps has a battery backed RTC - Adafruit Ultimate GPS Breakout - 66 channel w/10 Hz updates (Version 3)
 
@@ -127,4 +129,4 @@ CONNECTION_INFO="$(get_connection_info)"
 
 # Signal end of initialization
 beep 50 10 10
-message -p 2 -r 180 -e 3600 -s echo "Initialization Complete!" $'The telescope is all yours. You can now perform star alignment. The serial over IP proxy is online. You can control the telescope via:\n\n'"$CONNECTION_INFO"$'\n\nClear skyes!'
+message -p 2 -r 180 -e 3600 $SOUND_FINAL "Initialization Complete!" $'The telescope is all yours. You can now perform star alignment. The serial over IP proxy is online. You can control the telescope via:\n\n'"$CONNECTION_INFO"$'\n\nClear skyes!'

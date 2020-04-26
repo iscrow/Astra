@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+WLAN0=$(iwconfig wlan0 | grep 'ESSID:"' | sed -E 's/.* ESSID:"(.*)"\s*$/\1/g')
+AP0=$(hostapd_cli status | awk -F= '/^ssid/ {print $2}')
+
+IF_LIST=$(ip -o addr | awk '!/^[0-9]*: ?lo|link\/ether|inet6/ {gsub("/", " "); print $2" "$4}')
+
+IPS=$(echo "$IF_LIST" | sed -E "s/^wlan0/$WLAN0:/g;s/^ap0/$AP0:/g")
+
+cat << EOF
+Current IPs:
+$IPS
+EOF
